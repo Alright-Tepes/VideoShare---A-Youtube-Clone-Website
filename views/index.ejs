@@ -1,0 +1,44 @@
+<%- include('partials/header') %>
+    <div class="container">
+        <div class="categories"
+            style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 1rem; margin-bottom: 1rem; white-space: nowrap;">
+            <a href="/" class="category-badge <%= !currentCategory ? 'active' : '' %>">Hepsi</a>
+            <% const categoryMap={ 'Music' : 'Müzik' , 'Gaming' : 'Oyun' , 'Education' : 'Eğitim' , 'Tech' : 'Teknoloji'
+                , 'Entertainment' : 'Eğlence' , 'News' : 'Haberler' , 'Other' : 'Diğer' };
+                Object.keys(categoryMap).forEach(cat=> { %>
+                <a href="/?category=<%= cat %>" class="category-badge <%= currentCategory === cat ? 'active' : '' %>">
+                    <%= categoryMap[cat] %>
+                </a>
+                <% }) %>
+        </div>
+
+        <div class="video-grid">
+            <% if (videos.length> 0) { %>
+                <% videos.forEach(video=> { %>
+                    <a href="/watch/<%= video._id %>" class="video-card">
+                        <div class="thumbnail-container">
+                            <img src="<%= video.thumbnailUrl %>" alt="<%= video.title %>">
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">
+                                <%= video.title %>
+                            </h3>
+                            <div class="video-meta">
+                                <object><a href="/channel/<%= video.uploadedBy._id %>" class="channel-link"
+                                        style="font-weight: 500; color: var(--text-color);">
+                                        <%= video.uploadedBy.username %>
+                                    </a></object>
+                                <p>
+                                    <%= video.views %> izlenme • <%= new Date(video.createdAt).toLocaleDateString() %>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                    <% }) %>
+                        <% } else { %>
+                            <p style="grid-column: 1/-1; text-align: center;">Video bulunamadı. İlk yükleyen siz olun!
+                            </p>
+                            <% } %>
+        </div>
+
+        <%- include('partials/footer') %>

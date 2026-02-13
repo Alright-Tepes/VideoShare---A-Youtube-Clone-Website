@@ -1,0 +1,71 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2><i class="fas fa-bell" style="color: var(--primary-color);"></i> Bildirimler</h2>
+            <form action="/notifications/read" method="POST">
+                <button type="submit" class="btn">Tümünü okundu olarak işaretle</button>
+            </form>
+        </div>
+
+        <% if (notifications.length> 0) { %>
+            <div class="notification-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                <% notifications.forEach(notif=> { %>
+                    <div class="notification-card <%= notif.read ? '' : 'unread' %>" <% if (notif.type==='deletion' ) {
+                        %>
+                        onclick="showDeletionFromData(this)"
+                        data-title="<%= notif.videoTitle %>"
+                            data-reason="<%= notif.message %>"
+                                data-id="<%= notif._id %>"
+                                    style="cursor: pointer; background: var(--surface-color); padding: 1rem;
+                                    border-radius: 8px; border-left: 4px solid <%= notif.read ? 'transparent'
+                                        : 'var(--primary-color)' %>; display: flex; align-items: center; gap: 1rem;"
+                                        <% } else { %>
+                                            style="background: var(--surface-color); padding: 1rem; border-radius: 8px;
+                                            border-left: 4px solid <%= notif.read ? 'transparent'
+                                                : 'var(--primary-color)' %>; display: flex; align-items: center; gap:
+                                                1rem;"
+                                                <% } %>>
+
+                                                    <a href="/channel/<%= notif.sender._id %>">
+                                                        <img src="<%= notif.sender.avatarUrl %>" alt="Avatar"
+                                                            style="width: 40px; height: 40px; border-radius: 50%;">
+                                                    </a>
+
+                                                    <div style="flex: 1;">
+                                                        <p>
+                                                            <strong><a href="/channel/<%= notif.sender._id %>">
+                                                                    <%= notif.sender.username %>
+                                                                </a></strong>
+                                                            <% if (notif.type==='like' ) { %>
+                                                                videonuzu beğendi: <strong><a
+                                                                        href="/watch/<%= notif.video._id %>">
+                                                                        <%= notif.video.title %>
+                                                                    </a></strong>
+                                                                <% } else if (notif.type==='comment' ) { %>
+                                                                    şu videonuza yorum yaptı: <strong><a
+                                                                            href="/watch/<%= notif.video._id %>">
+                                                                            <%= notif.video.title %>
+                                                                        </a></strong>
+                                                                    <% } else if (notif.type==='follow' ) { %>
+                                                                        sizi takip etmeye başladı
+                                                                        <% } else if (notif.type==='deletion' ) { %>
+                                                                            <strong style="color: #e74c3c;">Video
+                                                                                Kaldırıldı:</strong> "<%=
+                                                                                notif.videoTitle %>" (Detaylar için
+                                                                                tıklayın)
+                                                                                <% } %>
+                                                        </p>
+                                                        <small style="color: #606060;">
+                                                            <%= new Date(notif.createdAt).toLocaleString() %>
+                                                        </small>
+                                                    </div>
+                    </div>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <p>Henüz bildiriminiz yok.</p>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

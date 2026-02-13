@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <h2 style="margin-bottom: 1.5rem;">"<%= query %>" için arama sonuçları</h2>
+
+        <% if (videos.length> 0) { %>
+            <div class="video-grid">
+                <% videos.forEach(video=> { %>
+                    <a href="/watch/<%= video._id %>" class="video-card">
+                        <div class="thumbnail-container">
+                            <img src="<%= video.thumbnailUrl %>" alt="<%= video.title %>">
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">
+                                <%= video.title %>
+                            </h3>
+                            <div class="video-meta">
+                                <p>
+                                    <%= video.views %> izlenme • <%= new Date(video.createdAt).toLocaleDateString() %>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <p>Aramanızla eşleşen video bulunamadı.</p>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

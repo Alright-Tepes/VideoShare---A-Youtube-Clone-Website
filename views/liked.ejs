@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <h2 style="margin-bottom: 1.5rem;"><i class="fas fa-thumbs-up" style="color: var(--primary-color);"></i>
+            Beğenilen Videolar</h2>
+
+        <% if (videos.length> 0) { %>
+            <div class="video-grid">
+                <% videos.forEach(video=> { %>
+                    <a href="/watch/<%= video._id %>" class="video-card">
+                        <div class="thumbnail-container">
+                            <img src="<%= video.thumbnailUrl %>" alt="<%= video.title %>">
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">
+                                <%= video.title %>
+                            </h3>
+                            <div class="video-meta">
+                                <p>
+                                    <%= video.views %> izlenme • <%= new Date(video.createdAt).toLocaleDateString() %>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <p>Henüz hiçbir videoyu beğenmediniz.</p>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

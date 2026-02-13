@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erişim Engellendi - VideoShare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --surface-color: #1a1a1a;
+            --text-color: #ffffff;
+            --primary-color: #ff0000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .banned-card {
+            background: var(--surface-color);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid var(--primary-color);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .reason-box {
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .reason-label {
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .footer-note {
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .logout-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #777;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="banned-card">
+        <div class="icon">
+            <i class="fas fa-user-slash"></i>
+        </div>
+        <h1>Siteye Girişiniz Yasaklanmıştır</h1>
+        <p>Topluluk kurallarımızı ihlal ettiğiniz belirlendiği için siteye erişiminiz kalıcı olarak engellenmiştir.</p>
+
+        <div class="reason-box">
+            <span class="reason-label">Yasaklanma Gerekçesi:</span>
+            <span id="banReason">
+                <%= (locals.user && locals.user.banReason) ? locals.user.banReason
+                    : "Kural ihlali veya yasaklı IP adresi tespit edildi." %>
+            </span>
+        </div>
+
+        <div class="footer-note">
+            IP Adresiniz: <%= ip %><br>
+                Hatalı bir karar olduğunu düşünüyorsanız destek ekibiyle iletişime geçin.
+        </div>
+
+        <% if (locals.user) { %>
+            <a href="/logout" class="logout-link">Güvenli Çıkış</a>
+            <% } %>
+    </div>
+</body>
+
+</html>

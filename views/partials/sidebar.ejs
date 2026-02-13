@@ -1,0 +1,128 @@
+<aside class="main-sidebar">
+    <nav class="sidebar-nav">
+        <a href="/" class="nav-item <%= typeof currentCategory === 'undefined' ? 'active' : '' %>">
+            <i class="fas fa-home"></i> <span>Ana Sayfa</span>
+        </a>
+        <a href="/trending" class="nav-item">
+            <i class="fas fa-fire"></i> <span>Trendler</span>
+        </a>
+        <a href="/notifications" class="nav-item">
+            <i class="fas fa-bell"></i> <span>Bildirimler</span>
+        </a>
+        <hr>
+        <a href="/history" class="nav-item">
+            <i class="fas fa-history"></i> <span>Geçmiş</span>
+        </a>
+        <a href="/liked-videos" class="nav-item">
+            <i class="fas fa-thumbs-up"></i> <span>Beğenilenler</span>
+        </a>
+        <a href="/playlists" class="nav-item">
+            <i class="fas fa-list"></i> <span>Listelerim</span>
+        </a>
+
+        <% if (user && user.following && user.following.length> 0) { %>
+            <hr>
+            <h4 class="sidebar-section-title">Abonelikler</h4>
+            <div class="subscriptions-list">
+                <% user.following.forEach(follow=> { %>
+                    <a href="/channel/<%= follow._id %>" class="nav-item sub-item">
+                        <img src="<%= follow.avatarUrl %>" alt="<%= follow.username %>" class="sidebar-avatar">
+                        <span>
+                            <%= follow.username %>
+                        </span>
+                    </a>
+                    <% }) %>
+            </div>
+            <% } %>
+    </nav>
+</aside>
+
+<style>
+    .main-sidebar {
+        width: 240px;
+        background: var(--surface-color);
+        height: calc(100vh - 56px);
+        position: fixed;
+        top: 56px;
+        left: 0;
+        overflow-y: auto;
+        padding: 1rem 0;
+        z-index: 90;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 0.75rem 1.5rem;
+        color: var(--text-color);
+        font-size: 0.95rem;
+        transition: background 0.2s;
+    }
+
+    .nav-item i {
+        font-size: 1.2rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    .nav-item:hover {
+        background: var(--hover-color);
+    }
+
+    .nav-item.active {
+        background: var(--hover-color);
+        font-weight: 600;
+    }
+
+    .sidebar-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .sidebar-section-title {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.9rem;
+        color: #606060;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    hr {
+        border: 0;
+        border-top: 1px solid var(--border-color);
+        margin: 0.75rem 0;
+    }
+
+    /* Scrollbar Styling */
+    .main-sidebar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .main-sidebar::-webkit-scrollbar-thumb {
+        background: transparent;
+        border-radius: 4px;
+    }
+
+    .main-sidebar:hover::-webkit-scrollbar-thumb {
+        background: #ccc;
+    }
+
+    @media (max-width: 1200px) {
+        .main-sidebar {
+            transform: translateX(-100%);
+        }
+
+        .main-sidebar.active {
+            transform: translateX(0);
+        }
+    }
+</style>

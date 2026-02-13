@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2><i class="fas fa-history" style="color: var(--primary-color);"></i> İzleme Geçmişi</h2>
+            
+        </div>
+
+        <% if (history.length> 0) { %>
+            <div class="video-grid">
+                <% history.forEach(item=> { %>
+                    <a href="/watch/<%= item.video._id %>" class="video-card">
+                        <div class="thumbnail-container">
+                            <img src="<%= item.video.thumbnailUrl %>" alt="<%= item.video.title %>">
+                            <div class="duration"
+                                style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: white; padding: 2px 4px; border-radius: 4px; font-size: 0.8rem;">
+                                İzlendi
+                            </div>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">
+                                <%= item.video.title %>
+                            </h3>
+                            <div class="video-meta">
+                                <p>
+                                    <%= item.video.uploadedBy.username %>
+                                </p>
+                                <p>
+                                    <%= new Date(item.date).toLocaleDateString() %>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <div style="text-align: center; padding: 4rem;">
+                    <i class="fas fa-history" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                    <h3>İzleme geçmişi bulunamadı</h3>
+                    <p>İzlediğiniz videolar burada görünecektir.</p>
+                    <a href="/" class="btn btn-primary" style="margin-top: 1rem;">İzlemeye Başla</a>
+                </div>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

@@ -1,0 +1,55 @@
+<%- include('partials/header') %>
+
+    <div class="container" style="max-width: 800px;">
+        <div class="auth-form" style="max-width: 100%;">
+            <h2>Video Yükle</h2>
+            <% if (locals.error) { %>
+                <div
+                    style="background: #ffebeb; color: #ff0000; padding: 0.5rem; margin-bottom: 1rem; border-radius: 4px;">
+                    <%= error %>
+                </div>
+                <% } %>
+                    <form action="/upload" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" id="title" name="title" required placeholder="Video title">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" name="category" required
+                                style="width: 100%; padding: 0.5rem; background: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                                <option value="Music">Müzik</option>
+                                <option value="Gaming">Oyun</option>
+                                <option value="Education">Eğitim</option>
+                                <option value="Tech">Teknoloji</option>
+                                <option value="Entertainment">Eğlence</option>
+                                <option value="News">Haberler</option>
+                                <option value="Other" selected>Diğer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="embedUrl">Embed URL (src)</label>
+                            <input type="url" id="embedUrl" name="embedUrl" required
+                                placeholder="https://www.youtube.com/embed/dQw4w9WgXcQ">
+                            <small style="color: #666;">
+                                Lütfen **Yerleştirme URL'sini** yapıştırın (iframe kodundaki src özniteliği).
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="thumbnail">Küçük Resim</label>
+                            <input type="file" id="thumbnail" name="thumbnail" accept="image/*">
+                            <p style="font-size: 0.8rem; color: #666; margin-top: 0.25rem;">Veya aşağıya URL girin</p>
+                            <input type="url" id="thumbnailUrl" name="thumbnailUrl"
+                                placeholder="https://img.youtube.com/vi/VIDEO_ID/hqdefault.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Açıklama</label>
+                            <textarea id="description" name="description" rows="5"
+                                placeholder="İzleyicilere videonuz hakkında bilgi verin"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Yükle</button>
+                    </form>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>

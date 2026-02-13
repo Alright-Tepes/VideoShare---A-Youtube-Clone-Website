@@ -1,0 +1,664 @@
+<%- include('partials/header') %>
+
+    <div class="container admin-container">
+        <div class="admin-header">
+            <h2><i class="fas fa-user-shield"></i> Yönetim Paneli</h2>
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <span class="stat-value">
+                        <%= stats.userCount %>
+                    </span>
+                    <span class="stat-label">Kullanıcı</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">
+                        <%= stats.videoCount %>
+                    </span>
+                    <span class="stat-label">Aktif Video</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">
+                        <%= stats.removedVideoCount %>
+                    </span>
+                    <span class="stat-label">Silinen Video</span>
+                </div>
+                <div class="stat-card highlight">
+                    <span class="stat-value">
+                        <%= reports.length %>
+                    </span>
+                    <span class="stat-label">Rapor</span>
+                </div>
+                <div class="stat-card warning">
+                    <span class="stat-value">
+                        <%= appeals.length %>
+                    </span>
+                    <span class="stat-label">İtiraz</span>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'reportsTab')">Raporlar</button>
+            <button class="tab-btn" onclick="openTab(event, 'appealsTab')">İtirazlar</button>
+            <button class="tab-btn" onclick="openTab(event, 'usersTab')">Kullanıcılar</button>
+            <button class="tab-btn" onclick="openTab(event, 'videosTab')">Videolar</button>
+            <button class="tab-btn" onclick="openTab(event, 'removedVideosTab')">Kaldırılanlar</button>
+        </div>
+
+        
+        <div id="reportsTab" class="tab-content active">
+            <h3>Bekleyen Raporlar</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Raporlayan</th>
+                            <th>Tür</th>
+                            <th>İçerik</th>
+                            <th>Neden</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (reports.length===0) { %>
+                            <tr>
+                                <td colspan="5" class="empty-state">Bekleyen rapor yok.</td>
+                            </tr>
+                            <% } %>
+                                <% reports.forEach(r=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= r.reporter.username %>
+                                        </td>
+                                        <td><span class="badge">
+                                                <%= r.itemType==='video' ? 'Video' : 'Yorum' %>
+                                            </span></td>
+                                        <td>
+                                            <% if (r.itemType==='video' ) { %>
+                                                <a href="/watch/<%= r.itemId %>" target="_blank">Videoyu Gör</a>
+                                                <% } else if (r.itemType==='comment' ) { %>
+                                                    <a href="#"
+                                                        onclick="alert('Henüz doğrudan yorum linki desteklenmiyor, videoyu kontrol edin.'); return false;">Yorum
+                                                        Raporu</a>
+                                                    <% } else { %>
+                                                        ID: <%= r.itemId %>
+                                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <%= r.reason %>
+                                        </td>
+                                        <td class="actions">
+                                            <form action="/admin/report/<%= r._id %>/resolve" method="POST"
+                                                style="display:inline;">
+                                                <button class="btn-sm btn-success">Kapat</button>
+                                            </form>
+                                            <% if (r.itemType==='video' ) { %>
+                                                <button class="btn-sm btn-danger"
+                                                    onclick="openDeleteModal('<%= r.itemId %>', '<%= r.reason %>')">Sil</button>
+                                                <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="appealsTab" class="tab-content">
+            <h3>Video Silme İtirazları</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kullanıcı</th>
+                            <th>Video Başlığı</th>
+                            <th>Silme Nedeni</th>
+                            <th>Mesaj</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (appeals.length===0) { %>
+                            <tr>
+                                <td colspan="5" class="empty-state">Bekleyen itiraz yok.</td>
+                            </tr>
+                            <% } %>
+                                <% appeals.forEach(a=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= a.userId.username %>
+                                        </td>
+                                        <td>
+                                            <%= a.videoTitle %>
+                                        </td>
+                                        <td>
+                                            <%= a.deletionReason %>
+                                        </td>
+                                        <td><span class="msg-truncate" title="<%= a.userMessage %>">
+                                                <%= a.userMessage %>
+                                            </span></td>
+                                        <td class="actions">
+                                            <button class="btn-sm btn-primary"
+                                                onclick="openAppealModal('<%= a._id %>', '<%= a.videoTitle %>')">Yanıtla</button>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="usersTab" class="tab-content">
+            <h3>Son Kayıtlar</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kullanıcı</th>
+                            <th>Admin</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% recentUsers.forEach(u=> { %>
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <img src="<%= u.avatarUrl %>" class="avatar-sm">
+                                        <span>
+                                            <%= u.username %>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <form action="/admin/user/<%= u._id %>/toggle-admin" method="POST">
+                                        <button class="btn-sm <%= u.isAdmin ? 'btn-primary' : 'btn-gray' %>">
+                                            <%= u.isAdmin ? 'Evet' : 'Hayır' %>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        <% if (u.isBanned) { %>
+                                            <form action="/admin/user/<%= u._id %>/unban" method="POST"
+                                                style="display:inline;">
+                                                <button class="btn-sm btn-success">Yasağı Kaldır</button>
+                                            </form>
+                                            <% } else if (u._id.toString() !==user._id.toString()) { %>
+                                                <button class="btn-sm btn-danger"
+                                                    onclick="openBanModal('<%= u._id %>', '<%= u.username %>')">Yasakla</button>
+                                                <% } %>
+
+                                                    <% if (u._id.toString() !==user._id.toString()) { %>
+                                                        <form action="/admin/user/<%= u._id %>/delete" method="POST"
+                                                            onsubmit="return confirm('Kullanıcıyı ve tüm içeriğini silmek istediğine emin misin?')"
+                                                            style="display:inline;">
+                                                            <button class="btn-icon text-danger"><i
+                                                                    class="fas fa-trash"></i></button>
+                                                        </form>
+                                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="videosTab" class="tab-content">
+            <h3>Son Videolar</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Video</th>
+                            <th>Yükleyen</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% recentVideos.forEach(v=> { %>
+                            <tr>
+                                <td>
+                                    <div class="video-cell">
+                                        <img src="<%= v.thumbnailUrl %>" class="thumb-sm">
+                                        <span>
+                                            <%= v.title %>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <%= v.uploadedBy.username %>
+                                </td>
+                                <td>
+                                    <button class="btn-icon text-danger"
+                                        onclick="openDeleteModal('<%= v._id %>', '')"><i
+                                            class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="removedVideosTab" class="tab-content">
+            <h3>Kaldırılan Videolar</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Video</th>
+                            <th>Yükleyen</th>
+                            <th>Silme Nedeni</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (removedVideos.length===0) { %>
+                            <tr>
+                                <td colspan="4" class="empty-state">Kaldırılan video yok.</td>
+                            </tr>
+                            <% } %>
+                                <% removedVideos.forEach(v=> { %>
+                                    <tr>
+                                        <td>
+                                            <div class="video-cell">
+                                                <img src="<%= v.thumbnailUrl %>" class="thumb-sm">
+                                                <span>
+                                                    <%= v.title %>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <%= v.uploadedBy.username %>
+                                        </td>
+                                        <td><small>
+                                                <%= v.deletionReason %>
+                                            </small></td>
+                                        <td>
+                                            <form action="/admin/video/<%= v._id %>/restore" method="POST"
+                                                style="display:inline;">
+                                                <button class="btn-sm btn-success">Geri Yükle</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="deleteModal" class="admin-modal">
+        <div class="modal-content">
+            <h4>Videoyu Sil</h4>
+            <p>Silme nedenini giriniz (Kullanıcıya bildirilecektir):</p>
+            <form id="deleteForm" method="POST">
+                <textarea name="reason" rows="3" required
+                    placeholder="Örn: Telif hakkı ihlali, Topluluk kuralları..."></textarea>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-gray" onclick="closeModal('deleteModal')">İptal</button>
+                    <button type="submit" class="btn btn-danger">Videoyu Sil</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+    <div id="appealModal" class="admin-modal">
+        <div class="modal-content">
+            <h4>İtirazı Yanıtla</h4>
+            <p id="appealInfo"></p>
+            <form id="appealForm" method="POST">
+                <textarea name="adminResponse" rows="3" required
+                    placeholder="Kullanıcıya iletilecek yanıt..."></textarea>
+                <div class="modal-footer">
+                    <select name="status" class="form-control"
+                        style="padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color);">
+                        <option value="resolved">Onayla</option>
+                        <option value="rejected">Reddet</option>
+                    </select>
+                    <button type="button" class="btn btn-gray" onclick="closeModal('appealModal')">Kapat</button>
+                    <button type="submit" class="btn btn-primary">Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+    <div id="banModal" class="admin-modal">
+        <div class="modal-content">
+            <h4 style="color: var(--primary-color);">Kullanıcıyı Yasakla</h4>
+            <p id="banUserInfo"></p>
+            <form id="banForm" method="POST">
+                <textarea name="reason" rows="3" required
+                    placeholder="Yasaklanma gerekçesi (Kullanıcıya gösterilecektir)..."></textarea>
+
+                <div style="margin: 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" name="blockIp" value="true" id="blockIpCheckbox" checked>
+                    <label for="blockIpCheckbox" style="cursor:pointer; color: #777; font-size: 0.9rem;">
+                        IP Adresini de Blokla (Girişi Tamamen Engeller)
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-gray" onclick="closeModal('banModal')">İptal</button>
+                    <button type="submit" class="btn btn-danger">Yasakla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .admin-container {
+            margin-top: 2rem;
+            padding-bottom: 5rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 12px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .stat-card.highlight {
+            border-color: var(--primary-color);
+            background: rgba(22, 126, 251, 0.05);
+        }
+
+        .stat-card.warning {
+            border-color: #f39c12;
+            background: rgba(243, 156, 18, 0.05);
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            color: #777;
+            border-bottom: 2px solid transparent;
+            transition: 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .table-responsive {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.02);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #777;
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-cell,
+        .video-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .thumb-sm {
+            width: 60px;
+            height: 34px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: #eee;
+            text-transform: capitalize;
+            color: #333;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-gray {
+            background: #eee;
+            color: #333;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .text-danger {
+            color: #e74c3c;
+        }
+
+        .msg-truncate {
+            display: inline-block;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 2rem !important;
+        }
+
+        /* Modal */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h4 {
+            margin-top: 0;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: inherit;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <script>
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) tabcontent[i].classList.remove("active");
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function openDeleteModal(videoId, reportReason) {
+            const modal = document.getElementById('deleteModal');
+            const form = document.getElementById('deleteForm');
+            form.action = `/admin/video/${videoId}/delete`;
+            if (reportReason) {
+                form.querySelector('textarea').value = `Raporlanan neden: ${reportReason}`;
+            } else {
+                form.querySelector('textarea').value = '';
+            }
+            modal.style.display = 'flex';
+        }
+
+        function openAppealModal(appealId, videoTitle) {
+            const modal = document.getElementById('appealModal');
+            const form = document.getElementById('appealForm');
+            form.action = `/admin/appeal/${appealId}/respond`;
+            document.getElementById('appealInfo').innerText = `Video: ${videoTitle}`;
+            modal.style.display = 'flex';
+        }
+
+        function openBanModal(userId, username) {
+            const modal = document.getElementById('banModal');
+            const form = document.getElementById('banForm');
+            form.action = `/admin/user/${userId}/ban`;
+            document.getElementById('banUserInfo').innerText = `Kullanıcı: ${username}`;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            if (event.target.classList.contains('admin-modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+
+    <%- include('partials/footer') %>

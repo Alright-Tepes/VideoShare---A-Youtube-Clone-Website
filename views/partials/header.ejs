@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoShare</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-left">
+            <% if (typeof isAdminPage==='undefined' || !isAdminPage) { %>
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <% } %>
+                    <div class="logo">
+                        <a href="/">
+                            <i class="fab fa-youtube" style="color: var(--primary-color);"></i>
+                            <span>VideoShare</span>
+                        </a>
+                    </div>
+        </div>
+
+        <div class="search-bar-container" style="flex: 1; max-width: 600px; margin: 0 2rem;">
+            <form action="/search" method="GET" style="display: flex;">
+                <input type="text" name="q" placeholder="Ara"
+                    style="width: 100%; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 20px 0 0 20px; outline: none;">
+                <button type="submit"
+                    style="padding: 0.5rem 1.25rem; background: var(--hover-color); border: 1px solid var(--border-color); border-left: none; border-radius: 0 20px 20px 0; cursor: pointer;">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="nav-links">
+            <% if (user) { %>
+                <a href="/upload" class="btn"><i class="fas fa-plus"></i> Yükle</a>
+
+                <a href="/notifications" style="position: relative; margin-right: 1rem; color: var(--text-color);">
+                    <i class="fas fa-bell" style="font-size: 1.2rem;"></i>
+                    <% if (unreadCount> 0) { %>
+                        <span
+                            style="position: absolute; top: -5px; right: -8px; background: var(--primary-color); color: white; font-size: 0.7rem; padding: 2px 5px; border-radius: 50%;">
+                            <%= unreadCount %>
+                        </span>
+                        <% } %>
+                </a>
+
+                <div class="user-menu-container">
+                    <img src="<%= user.avatarUrl %>" alt="Avatar" class="avatar" onclick="toggleMenu()"
+                        style="cursor: pointer;">
+
+                    <div class="dropdown-menu" id="userMenu">
+                        <div class="menu-header">
+                            <img src="<%= user.avatarUrl %>" alt="Avatar" class="avatar-large">
+                            <p><strong>
+                                    <%= user.username %>
+                                </strong></p>
+                            <small>
+                                <%= user.email %>
+                            </small>
+                        </div>
+                        <hr>
+                        <a href="/studio" class="menu-item"><i class="fas fa-video"></i> Kanal Stüdyosu</a>
+                        <a href="/trending" class="menu-item"><i class="fas fa-fire"></i> Trendler</a>
+                        <a href="/history" class="menu-item"><i class="fas fa-history"></i> Geçmiş</a>
+                        <a href="/playlists" class="menu-item"><i class="fas fa-list"></i> Oynatma Listelerim</a>
+                        <a href="/appeals" class="menu-item"><i class="fas fa-gavel"></i> İtirazlarım</a>
+                        <a href="/channel/<%= user._id %>" class="menu-item"><i class="fas fa-user-circle"></i>
+                            Kanalınız</a>
+                        <a href="/liked-videos" class="menu-item"><i class="fas fa-thumbs-up"></i> Beğenilen
+                            Videolar</a>
+                        <% if (user.isAdmin) { %>
+                            <a href="/admin" class="menu-item"><i class="fas fa-user-shield"></i> Yönetici Paneli</a>
+                            <% } %>
+                                <a href="/profile" class="menu-item"><i class="fas fa-cog"></i> Ayarlar</a>
+                                <hr>
+                                <a href="#" class="menu-item" onclick="toggleDarkMode(event)"><i
+                                        class="fas fa-moon"></i> Karanlık Mod</a>
+                                <a href="/logout" class="menu-item"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+                    </div>
+                </div>
+
+                <script>
+                    function toggleMenu() {
+                        const menu = document.getElementById('userMenu');
+                        menu.classList.toggle('active');
+                    }
+
+                    // Close menu when clicking outside
+                    window.onclick = function (event) {
+                        if (!event.target.matches('.avatar') && !event.target.closest('.dropdown-menu')) {
+                            const menu = document.getElementById('userMenu');
+                            if (menu.classList.contains('active')) {
+                                menu.classList.remove('active');
+                            }
+                        }
+                    }
+
+                    function toggleDarkMode(e) {
+                        e.preventDefault();
+                        document.body.classList.toggle('dark-mode');
+                        const isDark = document.body.classList.contains('dark-mode');
+                        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    }
+
+                    if (savedTheme === 'dark') {
+                        document.body.classList.add('dark-mode');
+                    }
+
+                    function toggleSidebar() {
+                        const sidebar = document.querySelector('.main-sidebar');
+                        const content = document.getElementById('contentWrapper');
+                        sidebar.classList.toggle('active');
+
+                        // On desktop, adjust margin
+                        if (window.innerWidth > 1200) {
+                            if (sidebar.style.transform === 'translateX(-100%)') {
+                                sidebar.style.transform = 'translateX(0)';
+                                content.style.marginLeft = '240px';
+                            } else {
+                                sidebar.style.transform = 'translateX(-100%)';
+                                content.style.marginLeft = '0';
+                            }
+                        }
+                    }
+                </script>
+                <% } else { %>
+                    <a href="/login" class="btn btn-primary">Giriş Yap</a>
+                    <a href="/register">Kayıt Ol</a>
+                    <% } %>
+        </div>
+    </header>
+
+    <% if (typeof isAdminPage==='undefined' || !isAdminPage) { %>
+        <%- include('sidebar') %>
+            <div class="site-wrapper">
+                <div class="content-wrapper" id="contentWrapper">
+                    <% } %>
+
+                        <main class="container">
+
+                            
+                            <style>
+                                .admin-modal {
+                                    display: none;
+                                    position: fixed;
+                                    top: 0;
+                                    left: 0;
+                                    width: 100%;
+                                    height: 100%;
+                                    background: rgba(0, 0, 0, 0.5);
+                                    z-index: 2000;
+                                    align-items: center;
+                                    justify-content: center;
+                                }
+
+                                .modal-content {
+                                    background: var(--surface-color);
+                                    padding: 2rem;
+                                    border-radius: 16px;
+                                    width: 90%;
+                                    max-width: 500px;
+                                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                                    color: var(--text-color);
+                                }
+
+                                .btn-gray {
+                                    background: #eee;
+                                    color: #333;
+                                    padding: 0.5rem 1rem;
+                                    border-radius: 8px;
+                                    border: none;
+                                    cursor: pointer;
+                                }
+                            </style>
+                            <div id="deletionAlertModal" class="admin-modal">
+                                <div class="modal-content">
+                                    <h4 style="color: #e74c3c; margin-top:0;"><i
+                                            class="fas fa-exclamation-triangle"></i> Video
+                                        Kaldırıldı
+                                    </h4>
+                                    <div id="deletionAlertBody" style="margin: 1rem 0;">
+                                        
+                                    </div>
+                                    <div id="appealFormArea"
+                                        style="display: none; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                                        <h5 style="margin-top:0;">İtiraz Gönder</h5>
+                                        <textarea id="appealMessage" placeholder="Neden itiraz ettiğinizi açıklayın..."
+                                            rows="3"
+                                            style="width: 100%; margin: 10px 0; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-family: inherit; font-size: 1rem;"></textarea>
+                                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                            <button class="btn btn-gray"
+                                                onclick="toggleAppealForm(false)">Vazgeç</button>
+                                            <button class="btn btn-primary" onclick="submitAppeal()">Gönder</button>
+                                        </div>
+                                    </div>
+                                    <div id="deletionActions"
+                                        style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                                        <button class="btn btn-primary" onclick="toggleAppealForm(true)">İtiraz
+                                            Et</button>
+                                        <button class="btn btn-gray" onclick="closeDeletionModal()">Kapat</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                                window.showDeletionDetail = function (title, reason, id) {
+                                    const body = document.getElementById('deletionAlertBody');
+                                    body.innerHTML = `
+                <p style="margin-bottom: 0.5rem;"><strong>Video:</strong> ${title}</p>
+                <p><strong>Neden:</strong> ${reason}</p>
+                <p style="font-size: 0.9rem; color: #777; margin-top: 1.5rem;">Bu kararın hatalı olduğunu düşünüyorsanız itiraz edebilirsiniz.</p>
+            `;
+                                    window.currentDeletion = { title, reason, id };
+                                    document.getElementById('deletionAlertModal').style.display = 'flex';
+                                }
+
+                                window.showDeletionFromData = function (el) {
+                                    const title = el.getAttribute('data-title');
+                                    const reason = el.getAttribute('data-reason');
+                                    const id = el.getAttribute('data-id');
+                                    showDeletionDetail(title, reason, id);
+                                }
+
+                                function toggleAppealForm(show) {
+                                    document.getElementById('appealFormArea').style.display = show ? 'block' : 'none';
+                                    document.getElementById('deletionActions').style.display = show ? 'none' : 'flex';
+                                }
+
+                                function closeDeletionModal() {
+                                    document.getElementById('deletionAlertModal').style.display = 'none';
+                                    toggleAppealForm(false);
+                                    document.getElementById('appealMessage').value = '';
+                                }
+
+                                async function submitAppeal() {
+                                    const message = document.getElementById('appealMessage').value;
+                                    if (!message) return alert('Lütfen bir mesaj yazın.');
+
+                                    try {
+                                        const res = await fetch('/api/appeal', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                videoTitle: window.currentDeletion.title,
+                                                deletionReason: window.currentDeletion.reason,
+                                                userMessage: message,
+                                                videoId: window.currentDeletion.id
+                                            })
+                                        });
+                                        const data = await res.json();
+                                        if (data.success) {
+                                            alert('İtirazınız başarıyla iletildi.');
+                                            closeDeletionModal();
+                                        } else {
+                                            alert('Hata: ' + (data.message || 'Gönderilemedi'));
+                                        }
+                                    } catch (err) {
+                                        alert('Bir hata oluştu.');
+                                    }
+                                }
+                            </script>

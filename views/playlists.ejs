@@ -1,0 +1,80 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2><i class="fas fa-list" style="color: var(--primary-color);"></i> Oynatma Listelerim</h2>
+            <button onclick="document.getElementById('createPlaylistModal').style.display='block'"
+                class="btn btn-primary"><i class="fas fa-plus"></i> Yeni Liste</button>
+        </div>
+
+        <% if (playlists.length> 0) { %>
+            <div class="video-grid">
+                <% playlists.forEach(playlist=> { %>
+                    <div class="video-card">
+                        <a href="/playlist/<%= playlist._id %>" style="text-decoration: none; color: inherit;">
+                            <div class="thumbnail-container"
+                                style="background: #333; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-list" style="font-size: 3rem; color: #fff;"></i>
+                                <div class="duration"
+                                    style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: white; padding: 2px 4px; border-radius: 4px; font-size: 0.8rem;">
+                                    <%= playlist.videos.length %> video
+                                </div>
+                            </div>
+                            <div class="video-info">
+                                <h3 class="video-title">
+                                    <%= playlist.title %>
+                                </h3>
+                                <div class="video-meta">
+                                    <p>
+                                        <%= playlist.isPublic ? 'Herkese Açık' : 'Gizli' %>
+                                    </p>
+                                    <p>Oluşturulma: <%= new Date(playlist.createdAt).toLocaleDateString() %>
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <p>Henüz hiç oynatma listesi oluşturmadınız.</p>
+                <% } %>
+    </div>
+
+    
+    <div id="createPlaylistModal" class="modal"
+        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-content"
+            style="background-color: var(--surface-color); margin: 15% auto; padding: 2rem; border: 1px solid var(--border-color); width: 100%; max-width: 500px; border-radius: 8px;">
+            <span onclick="document.getElementById('createPlaylistModal').style.display='none'"
+                style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h3 style="margin-bottom: 1rem;">Yeni Oynatma Listesi Oluştur</h3>
+            <form action="/playlists" method="POST">
+                <div class="form-group">
+                    <label for="title">Başlık</label>
+                    <input type="text" id="title" name="title" required style="width: 100%; padding: 0.5rem;">
+                </div>
+                <div class="form-group">
+                    <label for="description">Açıklama</label>
+                    <textarea id="description" name="description" rows="3"
+                        style="width: 100%; padding: 0.5rem;"></textarea>
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="isPublic" name="isPublic" checked>
+                    <label for="isPublic">Herkese Açık</label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Oluştur</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Close modal if clicked outside
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('createPlaylistModal')) {
+                document.getElementById('createPlaylistModal').style.display = "none";
+            }
+        }
+    </script>
+
+    <%- include('partials/footer') %>

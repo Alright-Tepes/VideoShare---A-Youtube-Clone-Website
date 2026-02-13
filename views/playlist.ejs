@@ -1,0 +1,74 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+            <div>
+                <h2>
+                    <%= playlist.title %>
+                </h2>
+                <p style="color: #606060; margin: 0.5rem 0;">
+                    <%= playlist.description %>
+                </p>
+                <div class="video-meta">
+                    <span>Yükleyen: <a href="/channel/<%= playlist.creator._id %>">
+                            <%= playlist.creator.username %>
+                        </a></span> •
+                    <span>
+                        <%= playlist.videos.length %> video
+                    </span> •
+                    <span>
+                        <%= playlist.isPublic ? 'Herkese Açık' : 'Gizli' %>
+                    </span>
+                </div>
+            </div>
+            <% if (user && user._id.toString()===playlist.creator._id.toString()) { %>
+                <div style="text-align: right;">
+                    <form action="/playlist/<%= playlist._id %>/delete" method="POST"
+                        onsubmit="return confirm('Bu oynatma listesini silmek istediğinizden emin misiniz?')">
+                        <button type="submit" class="btn"
+                            style="background: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2;">Listeyi Sil</button>
+                    </form>
+                </div>
+                <% } %>
+        </div>
+
+        <% if (playlist.videos.length> 0) { %>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <% playlist.videos.forEach((video, index)=> { %>
+                    <div
+                        style="display: flex; gap: 1rem; padding: 1rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px;">
+                        <div
+                            style="font-size: 1.2rem; display: flex; align-items: center; color: #606060; width: 30px;">
+                            <%= index + 1 %>
+                        </div>
+                        <a href="/watch/<%= video._id %>"
+                            style="display: flex; gap: 1rem; flex: 1; text-decoration: none; color: inherit;">
+                            <img src="<%= video.thumbnailUrl %>" alt="<%= video.title %>"
+                                style="width: 160px; height: 90px; object-fit: cover; border-radius: 4px;">
+                            <div>
+                                <h4 style="margin: 0 0 0.5rem 0;">
+                                    <%= video.title %>
+                                </h4>
+                                <p class="channel-name">
+                                    <%= video.uploadedBy.username %>
+                                </p>
+                            </div>
+                        </a>
+                        <% if (user && user._id.toString()===playlist.creator._id.toString()) { %>
+                            <div style="display: flex; align-items: center;">
+                                <form action="/playlist/<%= playlist._id %>/remove" method="POST">
+                                    <input type="hidden" name="videoId" value="<%= video._id %>">
+                                    <button type="submit" class="btn" style="padding: 0.5rem; color: #606060;"
+                                        title="Listeden çıkar"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
+                            <% } %>
+                    </div>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <p>Bu oynatma listesinde video bulunmamaktadır.</p>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

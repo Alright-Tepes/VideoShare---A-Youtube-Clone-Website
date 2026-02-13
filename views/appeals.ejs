@@ -1,0 +1,65 @@
+<%- include('partials/header') %>
+
+    <div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+            <div style="font-size: 2rem; color: var(--primary-color);">
+                <i class="fas fa-history"></i>
+            </div>
+            <h1>İtirazlarım</h1>
+        </div>
+
+        <% if (appeals && appeals.length> 0) { %>
+            <div style="display: grid; gap: 1.5rem;">
+                <% appeals.forEach(appeal=> { %>
+                    <div
+                        style="background: var(--surface-color); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <h3 style="margin-bottom: 0.25rem;">
+                                    <%= appeal.videoTitle %>
+                                </h3>
+                                <small style="color: #777;">Tarih: <%= new
+                                        Date(appeal.createdAt).toLocaleDateString('tr-TR') %></small>
+                            </div>
+                            <% let statusColor='#e67e22' ; let statusText='Beklemede' ; if(appeal.status==='resolved' )
+                                { statusColor='#27ae60' ; statusText='Onaylandı' ; } else if(appeal.status==='rejected'
+                                ) { statusColor='#c0392b' ; statusText='Reddedildi' ; } %>
+                                <span
+                                    style="background: <%= statusColor %>; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold;">
+                                    <%= statusText %>
+                                </span>
+                        </div>
+
+                        <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <p style="margin-bottom: 0.5rem;"><strong>Silinme Nedeni:</strong>
+                                <%= appeal.deletionReason %>
+                            </p>
+                            <p><strong>Mesajınız:</strong>
+                                <%= appeal.userMessage %>
+                            </p>
+                        </div>
+
+                        <% if (appeal.adminResponse) { %>
+                            <div
+                                style="border-left: 4px solid var(--primary-color); padding-left: 1rem; margin-top: 1rem;">
+                                <p style="font-weight: bold; margin-bottom: 0.25rem;">Moderasyon Yanıtı:</p>
+                                <p style="color: #444;">
+                                    <%= appeal.adminResponse %>
+                                </p>
+                            </div>
+                            <% } %>
+                    </div>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <div
+                    style="text-align: center; padding: 5rem 2rem; background: var(--surface-color); border-radius: 12px; border: 1px dashed var(--border-color);">
+                    <i class="fas fa-folder-open" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                    <p style="color: #777;">Henüz bir itirazınız bulunmamaktadır.</p>
+                    <a href="/" class="btn btn-primary" style="margin-top: 1.5rem;">Ana Sayfaya Dön</a>
+                </div>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

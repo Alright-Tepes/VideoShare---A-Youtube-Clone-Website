@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <h2 style="margin-bottom: 1.5rem;"><i class="fas fa-fire" style="color: var(--primary-color);"></i> Popüler
+            Videolar</h2>
+
+        <% if (videos.length> 0) { %>
+            <div class="video-grid">
+                <% videos.forEach(video=> { %>
+                    <a href="/watch/<%= video._id %>" class="video-card">
+                        <div class="thumbnail-container">
+                            <img src="<%= video.thumbnailUrl %>" alt="<%= video.title %>">
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">
+                                <%= video.title %>
+                            </h3>
+                            <div class="video-meta">
+                                <p>
+                                    <%= video.views %> izlenme • <%= new Date(video.createdAt).toLocaleDateString() %>
+                                </p>
+                                <p class="channel-name">
+                                    <%= video.uploadedBy.username %>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <p>Henüz trend video bulunmuyor.</p>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

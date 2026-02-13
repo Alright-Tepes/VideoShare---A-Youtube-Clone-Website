@@ -1,0 +1,123 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2><i class="fas fa-video" style="color: var(--primary-color);"></i> Kanal Stüdyosu</h2>
+            <a href="/upload" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni Video Yükle</a>
+        </div>
+
+        
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+            <div
+                style="background: var(--surface-color); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div
+                    style="color: #777; font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; font-weight: bold;">
+                    Toplam İzlenme</div>
+                <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);">
+                    <%= stats.totalViews.toLocaleString() %>
+                </div>
+            </div>
+            <div
+                style="background: var(--surface-color); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div
+                    style="color: #777; font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; font-weight: bold;">
+                    Toplam Beğeni</div>
+                <div style="font-size: 2rem; font-weight: bold; color: #ffca28;">
+                    <%= stats.totalLikes.toLocaleString() %>
+                </div>
+            </div>
+            <div
+                style="background: var(--surface-color); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); grid-column: span 2;">
+                <div
+                    style="color: #777; font-size: 0.85rem; margin-bottom: 1rem; text-transform: uppercase; font-weight: bold;">
+                    Son 7 Günlük Trend</div>
+                <div style="display: flex; align-items: flex-end; gap: 10px; height: 60px;">
+                    <% if (stats.recentViews.length> 0) {
+                        const maxViews = Math.max(...stats.recentViews.map(v => v.count));
+                        %>
+                        <% stats.recentViews.forEach(day=> { %>
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                <div style="width: 100%; background: linear-gradient(to top, var(--primary-color), #ff5252); height: <%= (day.count / maxViews) * 100 %>%; border-radius: 3px; min-height: 4px;"
+                                    title="<%= day._id %>: <%= day.count %> izlenme"></div>
+                                <span style="font-size: 0.6rem; color: #999;">
+                                    <%= day._id.split('-').slice(1).join('/') %>
+                                </span>
+                            </div>
+                            <% }) %>
+                                <% } else { %>
+                                    <p style="color: #999; font-size: 0.8rem; margin: auto;">Yeterli veri henüz
+                                        toplanmadı.</p>
+                                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <h3>Videolarınız</h3>
+        </div>
+
+        <% if (videos.length> 0) { %>
+            <div
+                style="background: var(--surface-color); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--hover-color); text-align: left;">
+                            <th style="padding: 1rem;">Video</th>
+                            <th style="padding: 1rem;">Tarih</th>
+                            <th style="padding: 1rem;">İzlenme</th>
+                            <th style="padding: 1rem;">Beğeni</th>
+                            <th style="padding: 1rem; text-align: right;">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% videos.forEach(video=> { %>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 1rem; display: flex; align-items: center; gap: 1rem;">
+                                    <img src="<%= video.thumbnailUrl %>" alt="Thumb"
+                                        style="width: 80px; height: 45px; object-fit: cover; border-radius: 4px;">
+                                    <div>
+                                        <h4 style="margin: 0; font-size: 0.9rem;"><a href="/watch/<%= video._id %>">
+                                                <%= video.title %>
+                                            </a></h4>
+                                        
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem; color: #606060;">
+                                    <%= new Date(video.createdAt).toLocaleDateString() %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= video.views %>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <%= video.likes.length %>
+                                </td>
+                                <td style="padding: 1rem; text-align: right;">
+                                    <a href="/studio/video/<%= video._id %>/edit" class="btn"
+                                        style="padding: 0.25rem 0.75rem; font-size: 0.8rem; margin-right: 0.5rem;"><i
+                                            class="fas fa-edit"></i> Düzenle</a>
+                                    <form action="/studio/video/<%= video._id %>/delete" method="POST"
+                                        style="display: inline;"
+                                        onsubmit="return confirm('Bu videoyu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');">
+                                        <button type="submit" class="btn"
+                                            style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2;"><i
+                                                class="fas fa-trash"></i> Sil</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <% } else { %>
+                <div
+                    style="text-align: center; padding: 4rem 2rem; background: var(--surface-color); border-radius: 8px;">
+                    <i class="fas fa-film" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                    <h3>Video bulunamadı</h3>
+                    <p style="color: #606060; margin-bottom: 1.5rem;">Henüz hiç video yüklemediniz.</p>
+                    <a href="/upload" class="btn btn-primary">İlk Videoyu Yükle</a>
+                </div>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

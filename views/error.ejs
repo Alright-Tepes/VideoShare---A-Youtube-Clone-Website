@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+
+    <div class="container"
+        style="display: flex; align-items: center; justify-content: center; min-height: 60vh; text-align: center;">
+        <div
+            style="background: var(--surface-color); padding: 3rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; width: 90%;">
+            <div style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1.5rem;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 style="margin-bottom: 1rem;">Video Kullanılamıyor</h2>
+            <p style="color: #777; line-height: 1.6; font-size: 1.1rem;">
+                <%= message || "Bu video geçerli raporlandığı veya silindiği gerekçesiyle kullanılamıyor." %>
+            </p>
+            <div style="margin-top: 2rem;">
+                <a href="/" class="btn btn-primary" style="padding: 0.75rem 2rem; border-radius: 8px;">Ana Sayfaya
+                    Dön</a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
