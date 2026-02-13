@@ -29,7 +29,7 @@ VideoShare, kullanıcıların video embed linklerini paylaşabildiği, kanallar�
 
 1. **Projeyi klonlayın:**
    ```bash
-   git clone (https://github.com/Alright-Tepes/VideoShare---A-Youtube-Clone-Website.git)
+   git clone https://github.com/Alright-Tepes/VideoShare---A-Youtube-Clone-Website.git
    cd cevrimicivideoses
    ```
 
