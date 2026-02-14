@@ -48,6 +48,10 @@ VideoShare, kullanıcıların video embed linklerini paylaşabildiği, kanallar�
 4. **Uygulamayı başlatın:**
    ```bash
    npm run dev
+
+   or
+
+   click "start.bat"
    ```
 
 
